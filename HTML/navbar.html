@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container">
+        <button class="btn btn-outline-info me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+            <i class="bi bi-list"></i> Menú
+        </button>
+        
+        <a class="navbar-brand fw-bold" href="/">Quantum<span class="text-info">Edu</span></a>
+        
+        <div class="ms-auto d-flex align-items-center gap-3">
+            {% if session.get('usuario_id') %}
+                <span class="text-white small d-none d-md-inline">Hola, <strong>{{ session.get('usuario_nombre') }}</strong></span>
+                
+                {% if session.get('usuario_rol') == 'Administrador' %}
+                    <span class="badge bg-danger text-white fw-bold p-2"><i class="bi bi-shield-fill me-1"></i> ROL: ADMIN</span>
+                {% elif session.get('usuario_rol') == 'Lider' or session.get('usuario_rol') == 'Líder' %}
+                    <span class="badge bg-warning text-dark fw-bold p-2"><i class="bi bi-star-fill me-1"></i> ROL: LÍDER</span>
+                {% else %}
+                    <span class="badge bg-info text-dark fw-bold p-2"><i class="bi bi-person-fill me-1"></i> ROL: ESTUDIANTE</span>
+                {% endif %}
+                
+                <a href="/logout" class="btn btn-outline-danger btn-sm ms-2"><i class="bi bi-box-arrow-right"></i> Salir</a>
+            {% else %}
+                <a href="/login.html" class="btn btn-outline-light btn-sm px-3">Iniciar Sesión</a>
+                <a href="/registro.html" class="btn btn-info btn-sm px-3 fw-bold text-white">Registrarse</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

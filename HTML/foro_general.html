@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumEdu - Foro General</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Estilos específicos para las tarjetas de comunidad */
+        .community-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .community-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+        .community-img { height: 160px; object-fit: cover; }
+        .page-link { color: #0d1117; }
+        .page-item.active .page-link { background-color: #00bcd4; border-color: #00bcd4; color: white; }
+    </style>
+</head>
+<body class="bg-light">
+{% include 'sidebar.html' %}
+{% include 'navbar.html' %}
+    
+    <div class="container mt-4 mb-5">
+        
+        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+            <div>
+                <h2 class="fw-bold mb-0"><i class="bi bi-globe text-info me-2"></i> Directorio de Comunidades</h2>
+                <p class="text-muted mb-0">Encuentra y únete a grupos de estudio de todo el mundo cuántico.</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4 bg-white">
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        <label class="form-label small fw-bold text-muted">Buscar Comunidad</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="busquedaComunidad" class="form-control bg-light border-start-0" placeholder="Ej: Q# Programming, Física..." onkeyup="filtrarComunidades()">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-muted">Filtrar por Categoría</label>
+                        <select id="filtroCategoria" class="form-select bg-light" onchange="filtrarComunidades()">
+                            <option value="ALL">Todas las categorías</option>
+                            <option value="software">Software y Algoritmos</option>
+                            <option value="hardware">Hardware e Ingeniería</option>
+                            <option value="seguridad">Seguridad y Criptografía</option>
+                            <option value="teoria">Teoría y Física</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5" id="contenedorComunidades">
+            <!-- Aquí se inyectarán las comunidades desde la base de datos -->
+            <div class="row g-4">
+                {% if comunidades %}
+                    {% for comunidad in comunidades %}
+                    <div class="col-md-6 col-lg-4 comunidad-item" data-categoria="{{ comunidad.categoria }}">
+                        <div class="card h-100 shadow-sm border-0 community-card rounded-4">
+                            <div class="p-3 bg-dark text-white rounded-top-4 d-flex justify-content-between align-items-center">
+                                <span class="badge bg-info text-dark fw-bold">{{ comunidad.categoria }}</span>
+                                <small class="text-white"><i class="bi bi-calendar3 me-1"></i>{{ comunidad.fecha_creacion.strftime('%d/%m/%Y') }}</small>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h5 class="card-title fw-bold text-dark mb-2">{{ comunidad.nombre }}</h5>
+                                <p class="card-text text-muted small flex-grow-1">
+                                    {{ comunidad.descripcion }}
+                                </p>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <a href="/comunidad/{{ comunidad.id_comunidad }}" class="btn btn-sm btn-dark rounded-pill flex-grow-1">Entrar al Foro</a>
+                                    
+                                    <form action="/comunidad/{{ comunidad.id_comunidad }}/suscribir" method="POST" class="d-inline">
+                                        {% if comunidad.id_comunidad in suscritas_ids %}
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3" title="Dejar de seguir">
+                                                <i class="bi bi-heart-break-fill"></i> Dejar
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-sm btn-outline-info rounded-pill px-3" title="Suscribirse">
+                                                <i class="bi bi-heart-fill"></i> Seguir
+                                            </button>
+                                        {% endif %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-folder-symlink text-muted display-1"></i>
+                        <h4 class="mt-3 text-muted">No hay comunidades creadas todavía.</h4>
+                        <p class="text-muted small">¡Entra como Administrador y crea la primera!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div id="noResults" class="col-12 text-center p-5 d-none">
+                <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-muted">No se encontraron comunidades</h5>
+                <p class="text-muted small">Intenta con otros términos o solicita crear una nueva desde tu menú.</p>
+            </div>
+
+        </div>
+
+        <nav aria-label="Navegación de páginas de comunidades">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="alert('Cargando página 2...')">2</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="alert('Cargando página 3...')">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="alert('Cargando página 2...')">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+
+    <script>
+        function filtrarComunidades() {
+            const input = document.getElementById('busquedaComunidad').value.toLowerCase();
+            const filtro = document.getElementById('filtroCategoria').value;
+            const comunidades = document.querySelectorAll('.comunidad-item');
+            let visibles = 0;
+
+            comunidades.forEach(com => {
+                const titulo = com.querySelector('.card-title').textContent.toLowerCase();
+                const categoria = com.getAttribute('data-categoria');
+
+                const coincideTexto = titulo.includes(input);
+                const coincideCategoria = (filtro === 'ALL' || filtro === categoria);
+
+                if (coincideTexto && coincideCategoria) {
+                    com.style.display = 'block';
+                    visibles++;
+                } else {
+                    com.style.display = 'none';
+                }
+            });
+
+            // Mostrar u ocultar el mensaje de error y la paginación dependiendo de los resultados
+            document.getElementById('noResults').classList.toggle('d-none', visibles > 0);
+            document.querySelector('.pagination').style.display = visibles > 0 ? 'flex' : 'none';
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

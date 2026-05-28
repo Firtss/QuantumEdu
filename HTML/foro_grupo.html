@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumEdu - {{ comunidad.nombre }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-light">
+
+    {% include 'sidebar.html' %}
+    {% include 'navbar.html' %}
+
+    <div class="container py-4">
+        
+        <div class="bg-white p-4 rounded-4 shadow-sm mb-4 border-start border-info border-5">
+            <div class="mb-2">
+                <span class="badge bg-dark text-info fw-bold mb-2">{{ comunidad.categoria }}</span>
+            </div>
+            <h2 class="fw-bold text-dark"><i class="bi bi-people-fill text-info me-2"></i> {{ comunidad.nombre }}</h2>
+            <p class="text-muted mb-3">{{ comunidad.descripcion }}</p>
+            <div class="text-muted small">
+                <i class="bi bi-calendar3 me-1"></i> Comunidad creada el: <strong>{{ comunidad.fecha_creacion.strftime('%d/%m/%Y') }}</strong>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Crear Publicación</h5>
+                    <form action="/comunidad/{{ comunidad.id_comunidad }}/publicar" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <textarea class="form-control bg-light border-0" name="contenido_publicacion" rows="3" placeholder="Comparte tus dudas o conocimientos..." required></textarea>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small"><i class="bi bi-image"></i> Adjuntar Imagen</label>
+                                <input class="form-control form-control-sm" type="file" name="imagen_adjunta" accept="image/*">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small"><i class="bi bi-file-earmark-pdf"></i> Adjuntar Documento</label>
+                                <input class="form-control form-control-sm" type="file" name="documento_adjunto" accept=".pdf,.doc,.docx">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted small"><i class="bi bi-link-45deg"></i> Link (Opcional)</label>
+                                <input type="url" class="form-control form-control-sm" name="enlace_externo" placeholder="https://...">
+                            </div>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-info text-white fw-bold px-4 rounded-pill">
+                                <i class="bi bi-send-fill me-1"></i> Publicar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {% if publicaciones %}
+                    {% for pub in publicaciones %}
+                    <div class="card shadow-sm border-0 rounded-4 p-4 mb-3">
+                        
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-secondary text-white rounded-circle p-2 me-3 fw-bold small text-center" style="width: 35px; height: 35px; line-height: 20px;">
+                                    {{ pub.autor.nombre[0] | upper }} 
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{ pub.autor.nombre }}</h6> 
+                                    <small class="text-muted">{{ pub.fecha_publicacion.strftime('%d/%m/%Y a las %H:%M') }}</small>
+                                </div>
+                            </div>
+
+                            {% if session.get('usuario_rol') == 'Administrador' or comunidad.id_lider|int == session.get('usuario_id')|int or pub.id_usuario|int == session.get('usuario_id')|int %}
+                                <form action="/eliminar_publicacion/{{ pub.id_publicacion }}" method="POST" onsubmit="return confirm('⚠️ ¿Estás seguro de que deseas eliminar esta publicación?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle" title="Eliminar Publicación">
+                                        <i class="bi bi-trash3-fill fs-6"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="text-dark mb-2">{{ pub.contenido }}</p>
+                        
+                        {% if pub.imagen_url %}
+                            <div class="mt-3 mb-2">
+                                <img src="{{ url_for('static', filename='uploads/' + pub.imagen_url) }}" class="img-fluid rounded-3 shadow-sm" style="max-height: 300px; object-fit: cover;">
+                            </div>
+                        {% endif %}
+
+                        {% if pub.documento_url %}
+                            <div class="mt-3 p-2 border rounded bg-light d-inline-block">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i>
+                                    <div>
+                                        <p class="mb-0 fw-bold small text-dark">Documento Adjunto</p>
+                                        <a href="{{ url_for('static', filename='uploads/' ~ pub.documento_url) }}" target="_blank" class="text-decoration-none small">
+                                            Abrir archivo <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if pub.enlace_externo %}
+                            <div class="mt-2">
+                                <a href="{{ pub.enlace_externo }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Ver enlace adjunto
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        <hr class="text-muted my-3">
+
+                        <div class="comments-section">
+                            <h6 class="fw-bold mb-3 small text-muted">
+                                <i class="bi bi-chat-left-text me-1"></i> Respuestas ({{ pub.comentarios|length }})
+                            </h6>
+                            
+                            {% if pub.comentarios %}
+                                <div class="mb-3 ps-3 border-start border-2 border-info">
+                                    {% for com in pub.comentarios %}
+                                        <div class="mb-2 p-2 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                                            <div class="flex-grow-1 me-2">
+                                                <div class="mb-1">
+                                                    <span class="fw-bold small text-info">{{ com.autor.nombre }}</span>
+                                                    <small class="text-muted ms-2" style="font-size: 0.72rem;">
+                                                        {{ com.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                                                    </small>
+                                                </div>
+                                                <p class="mb-0 small text-dark">{{ com.contenido }}</p>
+                                            </div>
+
+                                            {% if session.get('usuario_rol') == 'Administrador' or comunidad.id_lider|int == session.get('usuario_id')|int or com.id_autor|int == session.get('usuario_id')|int %}
+                                                <form action="/eliminar_comentario/{{ com.id_comentario }}" method="POST" class="m-0" onsubmit="return confirm('¿Borrar este comentario?');">
+                                                    <button type="submit" class="btn btn-sm text-danger border-0 p-1" title="Eliminar Comentario">
+                                                        <i class="bi bi-x-circle-fill"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <form action="/publicacion/{{ pub.id_publicacion }}/comentar" method="POST" class="mt-2">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control border-0 bg-light px-3 rounded-start-pill" name="contenido_comentario" placeholder="Escribe una respuesta..." required>
+                                    <button class="btn btn-info text-white fw-bold px-4 rounded-end-pill" type="submit">Responder</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 text-muted bg-white rounded-4 shadow-sm">
+                        <i class="bi bi-chat-square-dots display-4 text-info"></i>
+                        <p class="mt-3 mb-0">Aún no hay publicaciones en esta comunidad. ¡Sé el primero!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

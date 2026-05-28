@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumEdu - Administrador</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Acentos específicos para el Admin */
+        .admin-border { border-left: 5px solid #dc3545; }
+        .bg-admin { background-color: #212529 !important; }
+    </style>
+</head>
+<body class="bg-light">
+{% include 'sidebar.html' %}
+{% include 'navbar.html' %}
+
+    <div class="container mt-4 mb-5">
+        <h2 class="fw-bold mb-4"><i class="bi bi-shield-check text-danger me-2"></i> Centro de Control Global</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <strong>Notificación:</strong> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-4">
+            
+            <div class="col-lg-6">
+                <form action="/crear_comunidad" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Nombre de la Comunidad</label>
+                        <input type="text" class="form-control bg-light" name="nombre_comunidad" placeholder="Ej. Computación Cuántica 101" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Categoría</label>
+                        <select class="form-select bg-light" name="categoria_comunidad" required>
+                            <option value="" selected disabled>Selecciona una categoría...</option>
+                            <option value="Desarrollo">💻 Desarrollo</option>
+                            <option value="Criptografía">🔐 Criptografía</option>
+                            <option value="Algoritmos">⚙️ Algoritmos</option>
+                            <option value="Hardware">🔬 Hardware Cuántico</option>
+                            <option value="General">🌐 General</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Descripción</label>
+                        <textarea class="form-control bg-light" name="descripcion_comunidad" rows="3" placeholder="¿De qué trata esta comunidad?" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 fw-bold">
+                        <i class="bi bi-plus-circle me-2"></i>Crear Comunidad
+                    </button>
+                </form>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4 admin-border mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-person-badge-fill text-danger me-2"></i>Asignar Líder de Grupo</h5>
+                        <p class="text-muted small mb-4">Asigna a un lider una comunidad</p>
+                        
+                        <form action="/asignar_lider" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Seleccionar Líder</label>
+                                <select name="id_usuario" class="form-select bg-light" required>
+                                    <option value="" disabled selected>-- Selecciona un líder disponible --</option>
+                                    {% for user in usuarios %}
+                                        {% if user.rol == 'Lider' %}
+                                            <option value="{{ user.id_usuario }}">
+                                                {{ user.nombre }} ({{ user.correo }})
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-muted">Comunidad a Asignar</label>
+                                <select name="id_comunidad" class="form-select bg-light" required>
+                                    <option value="" disabled selected>-- Selecciona una comunidad --</option>
+                                    {% for com in comunidades %}
+                                        <option value="{{ com.id_comunidad }}">{{ com.nombre }} ({{ com.categoria }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-danger fw-bold rounded-3">
+                                    <i class="bi bi-link-45deg me-2"></i> Vincular Líder a Comunidad
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow-sm border-0 rounded-4 admin-border mb-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-0">
+                        <h5 class="fw-bold"><i class="bi bi-trash3-fill text-danger me-2"></i>Gestionar Comunidades Activas</h5>
+                        <p class="text-muted small">Elimina permanentemente los foros que infrinjan las normas o ya no sean necesarios.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% if comunidades %}
+                                {% for com in comunidades %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 bg-light h-100">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold text-dark">{{ com.nombre }}</h6>
+                                            <span class="badge bg-secondary">{{ com.categoria }}</span>
+                                        </div>
+                                        
+                                        <form action="/admin/comunidad/{{ com.id_comunidad }}/eliminar" method="POST" 
+                                              onsubmit="return confirm('⚠️ ESTO NO SE PUEDE DESHACER.\n\n¿Estás completamente seguro de eliminar la comunidad \u0022{{ com.nombre }}\u0022? Se borrarán todas sus publicaciones y comentarios.');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Borrar comunidad">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="col-12 text-center text-muted small py-4">
+                                    No hay comunidades registradas en el sistema todavía.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow-sm border-0 rounded-4 admin-border">
+                    <div class="card-header bg-white border-0 pt-4 pb-0">
+                        <h5 class="fw-bold"><i class="bi bi-journal-check text-danger me-2"></i>Políticas y Reglas del Sitio</h5>
+                        <p class="text-muted small">Actualiza las normas que aparecerán en todas las comunidades.</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control bg-light" placeholder="Ej: No se permite publicar código malicioso..." id="inputRegla">
+                            <button class="btn btn-dark fw-bold px-4" type="button" onclick="agregarRegla()">Añadir Regla</button>
+                        </div>
+                        
+                        <ul class="list-group list-group-flush rounded border">
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                                <span class="small">1. Mantener un ambiente de respeto académico.</span>
+                                <button class="btn btn-link text-danger p-0"><i class="bi bi-trash"></i></button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function agregarRegla() {
+            const regla = document.getElementById("inputRegla").value;
+            if(regla !== "") {
+                alert("Nueva regla añadida globalmente a la Base de Datos:\n" + regla);
+                document.getElementById("inputRegla").value = "";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumEdu - Mis Comunidades</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Estilos importados del Foro General para la animación de las tarjetas */
+        .community-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .community-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+    </style>
+</head>
+<body class="bg-light">
+{% include 'sidebar.html' %}
+{% include 'navbar.html' %}
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-dark"><i class="bi bi-collection-play text-info me-2"></i>Mis Comunidades de Aprendizaje</h2>
+                <p class="text-muted">Espacios temáticos y foros a los que estás inscrito actualmente.</p>
+            </div>
+            <a href="/foro_general.html" class="btn btn-info text-white fw-bold"><i class="bi bi-plus-circle me-2"></i>Explorar Más Foros</a>
+        </div>
+
+        <div class="row">
+            {% if mis_comunidades %}
+                {% for com in mis_comunidades %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0 community-card rounded-4">
+                        <div class="p-3 bg-dark text-white rounded-top-4 d-flex justify-content-between align-items-center">
+                            <span class="badge bg-info text-dark fw-bold">💻 {{ com.categoria }}</span>
+                        </div>
+                        
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark mb-2">{{ com.nombre }}</h5>
+                            <p class="card-text text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ com.descripcion }}
+                            </p>
+                            
+                            <div class="d-grid mt-auto">
+                                <a href="/comunidad/{{ com.id_comunidad }}" class="btn btn-dark btn-sm rounded-pill fw-bold">
+                                    <i class="bi bi-arrow-right-circle me-1"></i> Entrar al Muro
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border-0">
+                    <i class="bi bi-compass display-5 text-muted mb-3 d-block"></i>
+                    <h6 class="text-secondary mb-2">Tu espacio está vacío</h6>
+                    <p class="text-muted small mb-3">Aún no sigues ninguna comunidad. Explora el foro general para suscribirte a tus temas favoritos.</p>
+                    <a href="/foro_general.html" class="btn btn-sm btn-outline-info rounded-pill px-4 fw-bold">Explorar Foro General</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
