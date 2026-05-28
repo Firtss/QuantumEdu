@@ -1,0 +1,221 @@
+/* --- VARIABLES GLOBALES --- */
+:root {
+    --quantum-dark: #0f172a;
+    --quantum-nav: #1e293b;
+    --quantum-accent: #38bdf8;
+    --leader-gold: #f59e0b;
+    --text-muted: #cbd5e1;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* --- ESTILOS BASE --- */
+body {
+    background-color: #f1f5f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--quantum-dark);
+}
+
+/* --- NAVEGACIÓN Y SIDEBAR --- */
+.navbar {
+    background-color: var(--quantum-dark) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.offcanvas {
+    background-color: var(--quantum-dark);
+    color: white;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    transition: 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--quantum-accent);
+    padding-left: 10px;
+}
+
+/* Variante para el Líder */
+.nav-link.leader-active {
+    color: var(--leader-gold);
+}
+
+/* --- COMPONENTES VISUALES --- */
+.hero-banner { 
+    background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+                url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=1000');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 60px 0;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 30px;
+}
+
+.news-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+}
+
+.forum-sidebar {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+/* --- TARJETAS DE GESTIÓN (Líder/Usuario) --- */
+.group-manager-card {
+    border: none;
+    border-radius: 15px;
+    background: white;
+    border-top: 4px solid var(--quantum-accent);
+    transition: 0.3s;
+}
+
+.group-manager-card.leader {
+    border-top-color: var(--leader-gold);
+}
+
+.group-manager-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Estilo para el fondo de las pantallas de autenticación */
+.auth-screen {
+    background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), 
+                url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=1000');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Tarjeta con efecto cristal (Glassmorphism) */
+.login-card, .register-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    color: white;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.login-card { max-width: 400px; }
+.register-card { max-width: 550px; }
+
+/* Estilo para los inputs dentro de las tarjetas oscuras */
+/*.auth-screen .form-control, .auth-screen .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white !important;
+}
+
+.auth-screen .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}*/
+
+/* Estilo para el selector en pantallas de autenticación */
+.auth-screen .form-select {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    cursor: pointer;
+}
+
+/* Estilo para las opciones del desplegable */
+.auth-screen .form-select option {
+    background-color: #1e293b !important; /* Un azul muy oscuro sólido */
+    color: white !important;
+    padding: 10px;
+}
+
+/* Para navegadores basados en Webkit (Chrome, Safari, Edge) */
+.auth-screen .form-select:focus {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+}
+
+.brand-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+}
+.brand-logo span { color: var(--quantum-accent); }
+/* Botón Quantum con alta visibilidad */
+.btn-quantum {
+    background-color: var(--quantum-accent) !important; /* Azul brillante */
+    color: #0f172a !important; /* Texto azul muy oscuro para contraste */
+    font-weight: bold !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); /* Un pequeño brillo */
+}
+
+.btn-quantum:hover {
+    background-color: #ffffff !important; /* Cambia a blanco al pasar el mouse */
+    color: var(--quantum-dark) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+}
+
+/* --- ESTILOS DEL FORO --- */
+.post-card {
+    background: white;
+    border-radius: 15px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.post-header { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+.post-body { padding: 15px; }
+.post-footer { padding: 10px 15px; background: #f8fafc; border-top: 1px solid #f1f5f9; border-radius: 0 0 15px 15px; }
+
+/* Sidebar de Recursos (Derecho) */
+.resources-sidebar {
+    position: sticky;
+    top: 90px; /* Para que no se esconda bajo el navbar */
+    height: fit-content;
+}
+
+.resource-item {
+    padding: 12px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    margin-bottom: 10px;
+    transition: 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resource-item:hover { background: #e2e8f0; }
+
+/* Comentarios */
+.comment-box {
+    font-size: 0.9rem;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    margin-top: 5px;
+    border-left: 3px solid var(--quantum-accent);
+}
