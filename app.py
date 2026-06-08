@@ -11,7 +11,18 @@ app.secret_key = 'clave_secreta_para_sesiones_quantum' # Permite usar sesiones s
 # ==========================================
 # CONFIGURACIÓN DE CONEXIÓN A MYSQL
 # ==========================================
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Santos.12@localhost/QuantumEdu_DB'
+# --- ANTES (Configuración Local) ---
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://tu_usuario:tu_clave@localhost/QuantumEdu_DB'
+
+# --- AHORA (Configuración Remota con Railway) ---
+import os
+
+# El sistema buscará una variable oculta llamada 'DATABASE_URL'. 
+# Si no la encuentra (como en tu computadora local), usará la que pongas a la derecha.
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL', 
+    'mysql+pymysql://root:MZranYXrzcvbWKUFExzUxuQYhVaPrjbI@acela.proxy.rlwy.net:12759/railway' # Cambia esta por tu URL de pruebas local si deseas
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
